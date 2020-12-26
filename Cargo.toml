@@ -1,0 +1,9 @@
+[package]
+name = "rl-algorithms"
+version = "0.1.0"
+authors = ["Tom Selfin <selfint@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+rl-environments = { path = "../rl-environments" }
+

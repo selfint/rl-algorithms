@@ -1,9 +1,9 @@
-struct QLearner {
+pub struct QLearner {
     q_table: Vec<Vec<f32>>,
 }
 
 impl QLearner {
-    fn new(states: usize, actions: usize) -> Self {
+    pub fn new(states: usize, actions: usize) -> Self {
         Self {
             q_table: vec![vec![0.; actions]; states],
         }

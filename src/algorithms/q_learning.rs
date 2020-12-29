@@ -82,6 +82,8 @@ where
                 self.q_table.insert(state.clone(), new_action_values);
             }
         };
+
+        self.epsilon *= 0.9;
     }
 }
 

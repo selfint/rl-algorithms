@@ -60,7 +60,7 @@ mod tests {
         let env_state = env.simple_state().unwrap();
         let action = learner.act(&env_state);
         if let 1 = action {
-            env.jump()
+            env.jump();
         }
         env.update();
     }

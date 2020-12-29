@@ -6,4 +6,4 @@ edition = "2018"
 
 [dependencies]
 rl-environments = { path = "../rl-environments" }
-
+rand = "0.8.0"

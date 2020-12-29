@@ -11,21 +11,17 @@ fn main() {
         let mut score: i128 = 0;
 
         while !env.done {
-            if let Some(env_state) = Some(env.raw_state()) {
-                let action = learner.act(&env_state);
-                if let 1 = action {
-                    env.jump();
-                }
-
-                let reward = env.update();
-                score += reward as i128;
-
-                if let Some(next_state) = Some(env.raw_state()) {
-                    learner.learn(&env_state, &next_state, action, reward as f32);
-                }
-            } else {
-                env.update();
+            let env_state = env.raw_state();
+            let action = learner.act(&env_state);
+            if let 1 = action {
+                env.jump();
             }
+
+            let reward = env.update();
+            score += reward as i128;
+
+            let next_state = env.raw_state();
+            learner.learn(&env_state, &next_state, action, reward as f32);
 
             if e > 950 || score > 10 {
                 // clear console and reset cursor

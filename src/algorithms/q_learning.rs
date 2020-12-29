@@ -3,24 +3,28 @@ use std::{collections, hash::Hash};
 
 pub struct QLearner<S>
 where
-    S: Eq + Hash,
+    S: Eq + Hash + Clone,
 {
     q_table: collections::HashMap<S, Vec<f32>>,
     actions: usize,
     epsilon: f32,
     epsilon_threshold: f32,
+    lr: f32,
+    gamma: f32,
 }
 
 impl<S> QLearner<S>
 where
-    S: Eq + Hash,
+    S: Eq + Hash + Clone,
 {
-    pub fn new(actions: usize) -> Self {
+    pub fn new(actions: usize, lr: f32, gamma: f32) -> Self {
         Self {
             q_table: collections::HashMap::new(),
             actions,
             epsilon: 1.,
             epsilon_threshold: 0.1,
+            lr,
+            gamma,
         }
     }
 
@@ -46,6 +50,39 @@ where
 
         thread_rng().gen_range(0..self.actions)
     }
+
+    pub fn learn(&mut self, state: &S, next_state: &S, action: usize, reward: f32) {
+        let next_state_max_value = match self.q_table.get(next_state) {
+            Some(action_values) => action_values
+                .iter()
+                .max_by(|&x, &y| {
+                    x.partial_cmp(y)
+                        .expect("Action values contained NaN - can't find max")
+                })
+                .expect("Failed to find max action value"),
+            None => {
+                self.q_table
+                    .insert(next_state.clone(), vec![0.; self.actions]);
+                &0.
+            }
+        };
+
+        let update = self.lr * (reward + self.gamma * next_state_max_value);
+        match self.q_table.get(state) {
+            Some(action_values) => {
+                let action_value = action_values[action];
+                self.q_table.get_mut(state).unwrap()[action] =
+                    (1.0 - self.lr) * action_value + update;
+            }
+            None => {
+                let action_value = reward;
+                let new_action_value: f32 = (1.0 - self.lr) * action_value + update;
+                let mut new_action_values = vec![0.; self.actions];
+                new_action_values[action] = new_action_value;
+                self.q_table.insert(state.clone(), new_action_values);
+            }
+        };
+    }
 }
 
 #[cfg(test)]
@@ -56,12 +93,26 @@ mod tests {
     #[test]
     fn test_act() {
         let mut env = JumpEnvironment::new(10);
-        let learner = QLearner::new(2);
+        let learner = QLearner::new(2, 0.1, 0.1);
         let env_state = env.simple_state().unwrap();
         let action = learner.act(&env_state);
         if let 1 = action {
             env.jump();
         }
         env.update();
+    }
+
+    #[test]
+    fn test_learn() {
+        let mut env = JumpEnvironment::new(10);
+        let mut learner = QLearner::new(2, 0.1, 0.1);
+        let env_state = env.simple_state().unwrap();
+        let action = learner.act(&env_state);
+        if let 1 = action {
+            env.jump();
+        }
+        let reward = env.update();
+        let next_state = env.simple_state().unwrap();
+        learner.learn(&env_state, &next_state, action, reward as f32);
     }
 }

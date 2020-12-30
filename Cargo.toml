@@ -5,5 +5,5 @@ authors = ["Tom Selfin <selfint@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-rl-environments = { path = "../rl-environments" }
+rl-environments = { git = "https://github.com/tomaster777/rl-environments" , branch = "main"}
 rand = "0.8.0"

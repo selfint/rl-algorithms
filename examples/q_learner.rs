@@ -4,7 +4,7 @@ use rl_environments::jump_environment::JumpEnvironment;
 use std::{thread, time};
 
 fn main() {
-    // notice that state type is detected automatically, in line 15
+    // notice that state type is detected automatically, in line 16
     let mut learner = QLearner::new(2, 1., 0.1);
 
     for e in 0..10 {

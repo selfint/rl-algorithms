@@ -4,9 +4,10 @@ use rl_environments::jump_environment::JumpEnvironment;
 use std::{thread, time};
 
 fn main() {
-    let mut learner = QLearner::new(2, 0.5, 0.1);
-    for e in 0..1000 {
-        println!("epoch={}", e);
+    // notice that state type is detected automatically, in line 18
+    let mut learner = QLearner::new(2, 1., 0.1);
+
+    for e in 0..10 {
         let mut env = JumpEnvironment::new(7);
         let mut score: i128 = 0;
 
@@ -23,17 +24,11 @@ fn main() {
             let next_state = env.raw_state();
             learner.learn(&env_state, &next_state, action, reward as f32);
 
-            if e > 950 || score > 10 {
-                // clear console and reset cursor
-                print!("\x1B[2J\x1B[1;1H");
+            // clear console and reset cursor
+            print!("\x1B[2J\x1B[1;1H");
 
-                println!("{}\nscore={} epoch={}", &env, score, e);
-                thread::sleep(time::Duration::from_millis(100));
-            }
-        }
-        if e > 950 {
-            println!("DEAD");
-            thread::sleep(time::Duration::from_millis(500));
+            println!("{}\nepoch={} score={}", &env, e, score);
+            thread::sleep(time::Duration::from_millis(100));
         }
     }
 }

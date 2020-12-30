@@ -90,25 +90,22 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rl_environments::jump_environment::JumpEnvironment;
 
     #[test]
     fn test_act() {
-        let mut env = JumpEnvironment::new(10);
         let learner = QLearner::new(2, 0.1, 0.1);
-        let env_state = &env.state;
+        let env_state = vec![1, 0];
         let action = learner.act(&env_state);
-        env.step(action);
+        assert!(action < 2);
     }
 
     #[test]
     fn test_learn() {
-        let mut env = JumpEnvironment::new(10);
         let mut learner = QLearner::new(2, 0.1, 0.1);
-        let env_state = &env.state.clone();
-        let action = learner.act(env_state);
-        let reward = env.step(action);
-        let next_state = &env.state;
-        learner.learn(env_state, next_state, action, reward as f32);
+        let env_state = vec![0, 1];
+        let action = learner.act(&env_state);
+        let reward = 1;
+        let next_state = vec![1, 0];
+        learner.learn(&env_state, &next_state, action, reward as f32);
     }
 }

@@ -96,25 +96,19 @@ mod tests {
     fn test_act() {
         let mut env = JumpEnvironment::new(10);
         let learner = QLearner::new(2, 0.1, 0.1);
-        let env_state = env.simple_state().unwrap();
+        let env_state = &env.state;
         let action = learner.act(&env_state);
-        if let 1 = action {
-            env.jump();
-        }
-        env.update();
+        env.step(action);
     }
 
     #[test]
     fn test_learn() {
         let mut env = JumpEnvironment::new(10);
         let mut learner = QLearner::new(2, 0.1, 0.1);
-        let env_state = env.simple_state().unwrap();
-        let action = learner.act(&env_state);
-        if let 1 = action {
-            env.jump();
-        }
-        let reward = env.update();
-        let next_state = env.simple_state().unwrap();
-        learner.learn(&env_state, &next_state, action, reward as f32);
+        let env_state = &env.state.clone();
+        let action = learner.act(env_state);
+        let reward = env.step(action);
+        let next_state = &env.state;
+        learner.learn(env_state, next_state, action, reward as f32);
     }
 }

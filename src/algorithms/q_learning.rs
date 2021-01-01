@@ -13,14 +13,8 @@ where
     gamma: f32,
 }
 
-fn get_max_action_value(action_values: &Vec<f32>) -> &f32 {
-    action_values
-        .iter()
-        .max_by(|&x, &y| {
-            x.partial_cmp(y)
-                .expect("Action values contained NaN - can't find max")
-        })
-        .expect("Failed to find max action value")
+fn get_max_action_value(action_values: &[f32]) -> f32 {
+    action_values.iter().cloned().fold(f32::INFINITY, f32::max)
 }
 
 impl<S> QLearner<S>
@@ -63,7 +57,7 @@ where
             None => {
                 self.q_table
                     .insert(next_state.clone(), vec![0.; self.actions]);
-                &0.
+                0.
             }
         };
 

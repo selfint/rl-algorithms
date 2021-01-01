@@ -13,6 +13,16 @@ where
     gamma: f32,
 }
 
+fn get_max_action_value(action_values: &Vec<f32>) -> &f32 {
+    action_values
+        .iter()
+        .max_by(|&x, &y| {
+            x.partial_cmp(y)
+                .expect("Action values contained NaN - can't find max")
+        })
+        .expect("Failed to find max action value")
+}
+
 impl<S> QLearner<S>
 where
     S: Eq + Hash + Clone,
@@ -31,17 +41,13 @@ where
     pub fn act(&self, state: &S) -> usize {
         if self.epsilon <= self.epsilon_threshold {
             if let Some(action_values) = self.q_table.get(state) {
-                let max_action_value: &f32 = action_values
-                    .iter()
-                    .max_by(|&x, &y| {
-                        x.partial_cmp(y)
-                            .expect("Action values contained NaN - can't find max")
-                    })
-                    .expect("Failed to find max action value");
+                let max_action_value = get_max_action_value(action_values);
+
                 let best_action = action_values
                     .iter()
                     .position(|v: &f32| (v - max_action_value).abs() < f32::EPSILON)
                     .unwrap();
+
                 return best_action;
             } else {
                 return thread_rng().gen_range(0..self.actions);
@@ -53,13 +59,7 @@ where
 
     pub fn learn(&mut self, state: &S, next_state: &S, action: usize, reward: f32) {
         let next_state_max_value = match self.q_table.get(next_state) {
-            Some(action_values) => action_values
-                .iter()
-                .max_by(|&x, &y| {
-                    x.partial_cmp(y)
-                        .expect("Action values contained NaN - can't find max")
-                })
-                .expect("Failed to find max action value"),
+            Some(action_values) => get_max_action_value(action_values),
             None => {
                 self.q_table
                     .insert(next_state.clone(), vec![0.; self.actions]);

@@ -107,5 +107,6 @@ mod tests {
         let reward = 1;
         let next_state = vec![1, 0];
         learner.learn(&env_state, &next_state, action, reward as f32);
+        assert!(learner.q_table.get(&env_state).unwrap()[action] > 0.);
     }
 }

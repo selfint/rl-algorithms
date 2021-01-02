@@ -6,6 +6,9 @@ edition = "2018"
 
 [dependencies]
 rand = "0.8.0"
+ndarray = "0.14.0"
+ndarray-stats = "0.4.0"
+neuron = { git = "https://github.com/tomaster777/neuron", branch = "main" }
 
 [dev-dependencies]
 rl-environments = { git = "https://github.com/tomaster777/rl-environments" , branch = "main"}

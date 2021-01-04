@@ -1,5 +1,7 @@
 use rand::{thread_rng, Rng};
 use std::{collections, hash::Hash};
+use ndarray::prelude::*;
+use ndarray_stats::QuantileExt;
 
 pub struct QLearner<S>
 where
@@ -11,10 +13,6 @@ where
     epsilon_threshold: f32,
     lr: f32,
     gamma: f32,
-}
-
-fn get_max_action_value(action_values: &[f32]) -> f32 {
-    action_values.iter().cloned().fold(f32::INFINITY, f32::max)
 }
 
 impl<S> QLearner<S>
@@ -35,14 +33,7 @@ where
     pub fn act(&self, state: &S) -> usize {
         if self.epsilon <= self.epsilon_threshold {
             if let Some(action_values) = self.q_table.get(state) {
-                let max_action_value = get_max_action_value(action_values);
-
-                let best_action = action_values
-                    .iter()
-                    .position(|v: &f32| (v - max_action_value).abs() < f32::EPSILON)
-                    .unwrap();
-
-                return best_action;
+                return arr1(action_values).argmax().unwrap();
             } else {
                 return thread_rng().gen_range(0..self.actions);
             }
@@ -53,7 +44,7 @@ where
 
     pub fn learn(&mut self, state: &S, next_state: &S, action: usize, reward: f32) {
         let next_state_max_value = match self.q_table.get(next_state) {
-            Some(action_values) => get_max_action_value(action_values),
+            Some(action_values) => *arr1(action_values).max().unwrap(),
             None => {
                 self.q_table
                     .insert(next_state.clone(), vec![0.; self.actions]);

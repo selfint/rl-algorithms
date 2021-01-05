@@ -20,8 +20,12 @@ impl Agent {
     pub fn act(&self, state: &[f32]) -> usize {
         self.network.predict(state).argmax().unwrap()
     }
+}
 
-    pub fn child(a1: &Agent, a2: &Agent) -> Self {
+pub struct NeuroEvolution;
+
+impl NeuroEvolution {
+    pub fn child(a1: &Agent, a2: &Agent) -> Agent {
         let mut rng = rand::thread_rng();
         let mut child_weights = Vec::with_capacity(a1.network.get_shape().len() - 1);
         let mut child_biases = Vec::with_capacity(a1.network.get_shape().len() - 1);
@@ -52,15 +56,12 @@ impl Agent {
             child_weights.push(layer_weights);
             child_biases.push(layer_biases);
         }
-        Self {
+
+        Agent {
             network: FullyConnected::build_stack(&child_weights, &child_biases),
         }
     }
-}
 
-pub struct NeuroEvolution;
-
-impl NeuroEvolution {
     pub fn mutate(agent: &mut Agent) {
         let mut rng = rand::thread_rng();
         if rng.gen_bool(0.5) {
@@ -119,7 +120,7 @@ mod tests {
     fn test_child() {
         let a1 = Agent::new(&[2, 3, 1]);
         let a2 = Agent::new(&[2, 3, 1]);
-        let child = Agent::child(&a1, &a2);
+        let child = NeuroEvolution::child(&a1, &a2);
 
         assert_ne!(child.network, a1.network);
         assert_ne!(child.network, a2.network);

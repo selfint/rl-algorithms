@@ -4,12 +4,12 @@ use rand::Rng;
 
 use neuron::layers::FullyConnected;
 
-struct Agent {
+pub struct Agent {
     network: FullyConnected,
 }
 
 impl Agent {
-    fn new(dims: &[usize]) -> Self {
+    pub fn new(dims: &[usize]) -> Self {
         assert!(!dims.is_empty());
 
         Agent {
@@ -17,11 +17,11 @@ impl Agent {
         }
     }
 
-    fn act(&self, state: &[f32]) -> usize {
+    pub fn act(&self, state: &[f32]) -> usize {
         self.network.predict(state).argmax().unwrap()
     }
 
-    fn child(a1: &Agent, a2: &Agent) -> Self {
+    pub fn child(a1: &Agent, a2: &Agent) -> Self {
         let mut rng = rand::thread_rng();
         let mut child_weights = Vec::with_capacity(a1.network.get_shape().len() - 1);
         let mut child_biases = Vec::with_capacity(a1.network.get_shape().len() - 1);
@@ -30,6 +30,7 @@ impl Agent {
         let a1_biases = a1.network.get_biases();
         let a2_biases = a2.network.get_biases();
         let shape = a1.network.get_shape();
+
         for i in 0..shape.len() - 1 {
             let mut layer_weights = Array2::default((shape[i + 1], shape[i]));
             layer_weights.assign(a1_weights[i]);

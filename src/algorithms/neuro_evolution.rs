@@ -57,9 +57,62 @@ impl Agent {
     }
 }
 
+pub struct NeuroEvolution;
+
+impl NeuroEvolution {
+    pub fn mutate(agent: &mut Agent) {
+        let mut rng = rand::thread_rng();
+        if rng.gen_bool(0.5) {
+            NeuroEvolution::mutate_weight(agent);
+        } else {
+            NeuroEvolution::mutate_bias(agent);
+        }
+    }
+
+    fn mutate_weight(agent: &mut Agent) {
+        let mut rng = rand::thread_rng();
+        let mut network_weights = agent.network.get_weights_mut();
+        let layer = rng.gen_range(0..network_weights.len() - 1);
+        let node = rng.gen_range(0..network_weights[layer].shape()[0]);
+        let previous_node = rng.gen_range(0..network_weights[layer].shape()[1]);
+        let weight = network_weights[layer]
+            .get_mut([node, previous_node])
+            .unwrap();
+
+        *weight = rng.gen_range(-0.01..0.01);
+    }
+
+    fn mutate_bias(agent: &mut Agent) {
+        let mut rng = rand::thread_rng();
+        let mut network_biases = agent.network.get_biases_mut();
+        let layer = rng.gen_range(0..network_biases.len() - 1);
+        let node = rng.gen_range(0..network_biases[layer].shape()[0]);
+        let bias = network_biases[layer].get_mut(node).unwrap();
+
+        *bias = rng.gen_range(-0.01..0.01);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_mutate() {
+        let mut a = Agent::new(&[2, 3, 1]);
+        let network_weights_before = a.network.clone_weights();
+        let network_biases_before = a.network.clone_biases();
+
+        NeuroEvolution::mutate(&mut a);
+
+        let network_weights_after = a.network.clone_weights();
+        let network_biases_after = a.network.clone_biases();
+
+        assert!(
+            network_weights_before != network_weights_after
+                || network_biases_before != network_biases_after
+        );
+    }
 
     #[test]
     fn test_child() {

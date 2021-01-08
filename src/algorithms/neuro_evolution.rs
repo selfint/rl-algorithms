@@ -134,7 +134,6 @@ mod tests {
         let actions = 2;
         let agent_action = agent.act(&state);
 
-        assert!(agent_action >= 0);
         assert!(agent_action < actions);
     }
 }

@@ -8,7 +8,9 @@ edition = "2018"
 rand = "0.8.1"
 ndarray = "0.14.0"
 ndarray-stats = "0.4.0"
-neuron = { git = "https://github.com/tomaster777/neuron", branch = "main" }
+#neuron = { git = "https://github.com/tomaster777/neuron", branch = "main" }
+neuron = { path = "../neuron" }
 
 [dev-dependencies]
-rl-environments = { git = "https://github.com/tomaster777/rl-environments" , branch = "main"}
+#rl-environments = { git = "https://github.com/tomaster777/rl-environments" , branch = "main"}
+rl-environments = { path = "../rl-environments" }

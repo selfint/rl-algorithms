@@ -4,6 +4,7 @@ use rand::Rng;
 
 use neuron::layers::FullyConnected;
 
+#[derive(Debug, PartialEq)]
 pub struct Agent {
     network: FullyConnected,
 }
@@ -22,9 +23,19 @@ impl Agent {
     }
 }
 
-pub struct NeuroEvolution;
+pub struct NeuroEvolution {
+    pub population: Vec<Agent>,
+}
 
 impl NeuroEvolution {
+    pub fn new(agents: usize, network_dimensions: &[usize]) -> Self {
+        Self {
+            population: (0..agents)
+                .map(|_| Agent::new(network_dimensions))
+                .collect(),
+        }
+    }
+
     pub fn child(a1: &Agent, a2: &Agent) -> Agent {
         let mut rng = rand::thread_rng();
         let mut child_weights = Vec::with_capacity(a1.network.get_shape().len() - 1);
@@ -98,6 +109,12 @@ impl NeuroEvolution {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_new_generation() {
+        let neuro_evolution = NeuroEvolution::new(10, &[2, 3, 1]);
+        assert_eq!(neuro_evolution.population.len(), 10);
+    }
 
     #[test]
     fn test_mutate() {

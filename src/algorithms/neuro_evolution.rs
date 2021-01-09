@@ -96,8 +96,8 @@ impl Agent {
     fn mutate_weight(&mut self) {
         let mut rng = thread_rng();
 
-        let layer = rng.gen_range(0..self.network.layers.len() - 1);
-        let layer_weights = self.network.layers[layer].get_weights_mut();
+        let layer = self.network.layers.iter_mut().choose(&mut rng).unwrap();
+        let layer_weights = layer.get_weights_mut();
 
         let node = rng.gen_range(0..layer_weights.nrows());
         let previous_node = rng.gen_range(0..layer_weights.ncols());
@@ -108,8 +108,8 @@ impl Agent {
     fn mutate_bias(&mut self) {
         let mut rng = thread_rng();
 
-        let layer = rng.gen_range(0..self.network.layers.len() - 1);
-        let layer_biases = self.network.layers[layer].get_biases_mut();
+        let layer = self.network.layers.iter_mut().choose(&mut rng).unwrap();
+        let layer_biases = layer.get_biases_mut();
 
         let node = rng.gen_range(0..layer_biases.len());
 
@@ -253,7 +253,6 @@ mod tests {
 
     #[test]
     fn test_child() {
-        let mut neuro_evolution = NeuroEvolution::new(0, &[], 0.);
         let a1 = Agent::new(&[2, 3, 1]);
         let a2 = Agent::new(&[2, 3, 1]);
         let child = a1.crossover(&a2);

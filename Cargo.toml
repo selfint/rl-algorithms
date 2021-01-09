@@ -8,6 +8,7 @@ edition = "2018"
 rand = "0.8.1"
 ndarray = "0.14.0"
 ndarray-stats = "0.4.0"
+ndarray-rand = "0.13.0"
 #neuron = { git = "https://github.com/tomaster777/neuron", branch = "main" }
 neuron = { path = "../neuron" }
 

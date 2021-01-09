@@ -170,6 +170,18 @@ impl NeuroEvolution {
         };
         WeightedIndex::new(&weights).unwrap()
     }
+
+    pub fn act(&self, agent: usize, state: &Array1<f32>) -> Result<usize, String> {
+        if agent > self.population.len() {
+            Err(format!(
+                "Tried to get action from non-existent agent '{:?}', last agent is '{:?}'",
+                agent,
+                self.population.len()
+            ))
+        } else {
+            Ok(self.population[agent].act(state))
+        }
+    }
 }
 
 #[cfg(test)]
@@ -178,6 +190,14 @@ mod tests {
     use ndarray_rand::rand_distr::Uniform;
     use ndarray_rand::RandomExt;
 
+    #[test]
+    fn test_act() {
+        let state = array![1., 2., 3.];
+        let neuro_evolution = NeuroEvolution::new(10, &[3, 3, 1], 0.01);
+        for agent in 0..neuro_evolution.population.len() {
+            assert_eq!(neuro_evolution.act(agent, &state).unwrap(), 0);
+        }
+    }
     #[test]
     fn test_new_generation() {
         let agent_amount = 5;
